@@ -23,7 +23,7 @@ else:
     print(f"Selected device: {selected_device['name']}")
 
     # Parameters
-    duration = 10  # seconds
+    duration = 1  # seconds
     sample_rate = 44100  # Hertz
     channels = selected_device['max_input_channels']  # Use the maximum number of input channels
 
@@ -72,5 +72,12 @@ else:
     # Print the main frequencies and amplitudes
     main_freqs = xf[np.argsort(yf)[-10:]]  # Get top 10 frequencies
     main_amps = yf[np.argsort(yf)[-10:]]  # Get top 10 amplitudes
+    max_frequency = 0
+    max_amplitute = 0
     for freq, amp in zip(main_freqs, main_amps):
         print(f"Frequency: {freq:.2f} Hz, Amplitude: {amp:.2f}")
+        if freq>max_frequency:
+            max_frequency = freq
+        if amp > max_amplitute:
+            max_amplitute = amp
+    print(f"max freq={max_frequency}, max amp={max_amplitute}")
