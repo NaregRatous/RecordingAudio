@@ -1,6 +1,8 @@
 import sounddevice as sd
 import numpy as np
 import wave
+from scipy.fft import fft, fftfreq
+import matplotlib.pyplot as plt
 
 # List all available audio input devices
 print("Available audio input devices:")
@@ -40,3 +42,35 @@ else:
         wf.writeframes(audio_data.tobytes())
 
     print(f"Audio recorded and saved as {output_filename}.")
+
+    # Convert audio data to a numpy array
+    audio_data = np.array(audio_data, dtype=np.float32)
+
+    # If stereo, take one channel
+    if channels > 1:
+        audio_data = audio_data[:, 0]
+
+    # Perform FFT
+    N = len(audio_data)
+    yf = fft(audio_data)
+    xf = fftfreq(N, 1 / sample_rate)
+
+    # Get the positive frequencies
+    pos_mask = np.where(xf >= 0)
+    xf = xf[pos_mask]
+    yf = np.abs(yf[pos_mask])
+
+    # Plot the frequency and amplitude
+    plt.figure(figsize=(12, 6))
+    plt.plot(xf, yf)
+    plt.title("Frequency vs Amplitude")
+    plt.xlabel("Frequency (Hz)")
+    plt.ylabel("Amplitude")
+    plt.grid()
+    plt.show()
+
+    # Print the main frequencies and amplitudes
+    main_freqs = xf[np.argsort(yf)[-10:]]  # Get top 10 frequencies
+    main_amps = yf[np.argsort(yf)[-10:]]  # Get top 10 amplitudes
+    for freq, amp in zip(main_freqs, main_amps):
+        print(f"Frequency: {freq:.2f} Hz, Amplitude: {amp:.2f}")
